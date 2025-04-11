@@ -433,7 +433,7 @@ class YouTubeAPI:
                         return fpath
 
                 # Get download information from proxy
-                res = requests.get(f"{YTPROXY}/{vid_id}/key={YT_API_KEY}", timeout=300)
+                res = requests.get(f"{YTPROXY}/api/{vid_id}/key={YT_API_KEY}", timeout=300)
                 response = res.json()
 
                 if response['status'] == 'success':
@@ -491,7 +491,7 @@ class YouTubeAPI:
                 return info['url']
 
         def video_dl():
-            res = requests.get(f"{YTPROXY}/{vid_id}/key={YT_API_KEY}", timeout=300)
+            res = requests.get(f"{YTPROXY}/api/{vid_id}/key={YT_API_KEY}", timeout=300)
             response = res.json()
 
             if response['status'] == 'success':
