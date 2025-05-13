@@ -6,7 +6,7 @@ import random
 import re
 from concurrent.futures import ThreadPoolExecutor
 from typing import Union
-
+import string
 import requests
 import yt_dlp
 from pyrogram.enums import MessageEntityType
@@ -19,7 +19,6 @@ from AnonXMusic import LOGGER
 from AnonXMusic.utils.database import is_on_off
 from AnonXMusic.utils.formatters import time_to_seconds
 from config import YT_API_KEY, YTPROXY_URL as YTPROXY
-
 
 def cookie_txt_file():
     try:
@@ -435,7 +434,13 @@ class YouTubeAPI:
         def audio_dl(vid_id):
             try:
                 session = create_session()
-                headers= {'x-api-key': f"{YT_API_KEY}"}
+                #headers= {'x-api-key': f"{YT_API_KEY}"}
+                random_prefix = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+                ruseragent = f"{random_prefix} Mozilla/5.9 ({random.randint(1000, 9999)})"
+                headers = {
+                    "x-api-key": f"{YT_API_KEY}",
+                    "User-Agent": ruseragent
+                }
                 res = session.get(f"{YTPROXY}/api/info?video_id={vid_id}", headers=headers, timeout=300)
                 response = res.json()
 
@@ -548,4 +553,3 @@ class YouTubeAPI:
             downloaded_file = await loop.run_in_executor(None, lambda:audio_dl(vid_id))
         
         return downloaded_file, direct
-                
