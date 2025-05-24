@@ -490,7 +490,8 @@ class YouTubeAPI:
                     audio_url = base64.b64decode(songlink).decode()
                     ydl_opts = get_ydl_opts(f"downloads/{vid_id}.mp3")
                     with ThreadPoolExecutor(max_workers=4) as executor:
-                        future = executor.submit(lambda: yt_dlp.YoutubeDL(ydl_opts).download(audio_url))
+                        #future = executor.submit(lambda: yt_dlp.YoutubeDL(ydl_opts).download(audio_url))
+                        future = executor.submit(lambda: yt_dlp.YoutubeDL(ydl_opts).download(f"{audio_url}"))
                         future.result()
                     return xyz
                 else:
