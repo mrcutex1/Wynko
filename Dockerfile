@@ -1,9 +1,9 @@
 FROM nikolaik/python-nodejs:python3.10-nodejs20
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ffmpeg git curl wget zip unzip \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get install -y --no-install-recommends ffmpeg git curl wget zip sysbench preload unzip
+    #&& apt-get clean \
+    #&& rm -rf /var/lib/apt/lists/*
 
 COPY . /app/
 WORKDIR /app/
