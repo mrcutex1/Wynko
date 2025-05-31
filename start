@@ -1,1 +1,2 @@
+rm log.txt & touch log.txt
 python3 -m AnonXMusic
