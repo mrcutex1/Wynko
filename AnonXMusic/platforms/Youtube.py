@@ -478,30 +478,40 @@ class YouTubeAPI:
         #  New updated Method...
         def audio_dl(vid_id):
             try:
-                session = create_session()
+                if not YT_API_KEY:
+                    print("API KEY not set in config, Set API Key you got from @tgmusic_apibot")
+                    return None
+                if not YTPROXY:
+                    print("API Endpoint not set in config\nPlease set a valid endpoint for YTPROXY_URL in config.")
+                    return None
                 headers = {
                     "x-api-key": f"{YT_API_KEY}",
                     "User-Agent": "Mozilla/5"
                 }
-                fuck = "ok"
-                if fuck == "ok":
-                    xyz = os.path.join("downloads", f"{vid_id}.mp3")
-                    if os.path.exists(xyz):
-                        return xyz
-                ### Here send actully request dude.
-                    getAudio = session.get(f"{YTPROXY}/audio/{vid_id}", headers=headers, timeout=60)
+                xyz = os.path.join("downloads", f"{vid_id}.mp3")
+                if os.path.exists(xyz):
+                    return xyz
+                getAudio = requests.get(f"{YTPROXY}/audio/{vid_id}", headers=headers, timeout=60)
+                try:
                     songData = getAudio.json()
+                except Exception as e:
+                    print(f"Invalid response from API: {str(e)}")
+                    return None
+                status = songData.get('status')
+                if status == 'success':
                     songlink = songData['audio_url']
-                    logger.debug(f"Got url {songlink}")
                     audio_url = base64.b64decode(songlink).decode()
-                    ydl_opts = get_ydl_opts(f"downloads/{vid_id}.mp3")
+                    ydl_opts = get_ydl_opts(xyz)
                     with ThreadPoolExecutor(max_workers=4) as executor:
                         future = executor.submit(lambda: yt_dlp.YoutubeDL(ydl_opts).download(audio_url))
                         future.result()
                     return xyz
+                elif status == 'error':
+                    print(f"Error: {songData.get('message', 'Unknown error from API.')}")
+                    return None
                 else:
-                    print(f"Proxy returned error status: {response}")
-
+                    print("Could not fetch Backend \nPlease contact API provider.")
+                    return None
             except requests.exceptions.RequestException as e:
                 print(f"Network error while downloading: {str(e)}")
             except json.JSONDecodeError as e:
@@ -510,21 +520,29 @@ class YouTubeAPI:
                 print(f"Error in downloading song: {str(e)}")
             return None
         
-
         def video_dl(vid_id):
             try:
-                session = create_session()
+                if not YT_API_KEY:
+                    print("API KEY not set in config, Set API Key you got from @tgmusic_apibot")
+                    return None
+                if not YTPROXY:
+                    print("API Endpoint not set in config\nPlease set a valid endpoint for YTPROXY_URL in config.")
+                    return None
                 headers = {
                     "x-api-key": f"{YT_API_KEY}",
                     "User-Agent": "Mozilla/5"
                 }
-                loda = "ok"
-                if loda == 'ok':
-                    xyz = os.path.join("downloads", f"{vid_id}.mp4")
-                    if os.path.exists(xyz):
-                        return xyz
-                    getVideo = session.get(f"{YTPROXY}/beta/{vid_id}", headers=headers, timeout=60)
+                xyz = os.path.join("downloads", f"{vid_id}.mp4")
+                if os.path.exists(xyz):
+                    return xyz
+                getVideo = requests.get(f"{YTPROXY}/beta/{vid_id}", headers=headers, timeout=60)
+                try:
                     videoData = getVideo.json()
+                except Exception as e:
+                    print(f"Invalid response from API: {str(e)}")
+                    return None
+                status = videoData.get('status')
+                if status == 'success':
                     videolink = videoData['video_sd']
                     video_url = base64.b64decode(videolink).decode()
                     logger.debug(f"Got video url {video_url}")
@@ -533,9 +551,12 @@ class YouTubeAPI:
                         future = executor.submit(lambda: yt_dlp.YoutubeDL(ydl_opts).download(video_url))
                         future.result()  
                     return xyz
+                elif status == 'error':
+                    print(f"Error: {videoData.get('message', 'Unknown error from API.')}")
+                    return None
                 else:
-                    print(f"Proxy returned error status: {response}")
-
+                    print("Could not fetch Backend \nPlease contact API provider.")
+                    return None
             except requests.exceptions.RequestException as e:
                 print(f"Network error while downloading: {str(e)}")
             except json.JSONDecodeError as e:
